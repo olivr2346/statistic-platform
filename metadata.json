@@ -1,0 +1,6 @@
+{
+  "name": "TERMINAL_STAT // Day Trading Quant Analyzer",
+  "description": "Oldschool terminal-grade quantitative day trading analytics and staging workstation.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
