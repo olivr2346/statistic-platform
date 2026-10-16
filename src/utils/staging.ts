@@ -80,6 +80,27 @@ export function parseScreenshotTimestamp(filename: string): number | null {
   return null;
 }
 
+export function parseTradeTimestamp(timeStr: string): number {
+  if (!timeStr) return NaN;
+  const trimmed = timeStr.trim();
+  if (trimmed.includes('Z') || /[+-]\d{2}:?\d{2}$/.test(trimmed)) {
+    return new Date(trimmed).getTime();
+  }
+  const m = trimmed.match(/^(\d{4})-(\d{2})-(\d{2})[T ](\d{2}):(\d{2})(?::(\d{2}))?/);
+  if (m) {
+    const [, yr, mo, dy, hr, mi, sc] = m;
+    return Date.UTC(
+      parseInt(yr, 10),
+      parseInt(mo, 10) - 1,
+      parseInt(dy, 10),
+      parseInt(hr, 10),
+      parseInt(mi, 10),
+      parseInt(sc || '0', 10)
+    );
+  }
+  return new Date(trimmed).getTime();
+}
+
 /**
  * Matches a screenshot filename to a pending trade based on openTime and closeTime window
  */
@@ -92,8 +113,8 @@ export function matchScreenshotToTrades(
   if (ts === null) return null;
 
   for (const trade of trades) {
-    const openTs = new Date(trade.openTime).getTime();
-    const closeTs = new Date(trade.closeTime).getTime();
+    const openTs = parseTradeTimestamp(trade.openTime);
+    const closeTs = parseTradeTimestamp(trade.closeTime);
 
     if (isNaN(openTs) || isNaN(closeTs)) continue;
 

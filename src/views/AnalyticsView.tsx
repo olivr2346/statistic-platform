@@ -155,62 +155,42 @@ export const AnalyticsView: React.FC<AnalyticsViewProps> = ({ committedTrades, s
       <div className="flex items-center justify-between border border-zinc-800 bg-zinc-900/50 px-3 py-1.5 shrink-0 text-xs">
         <div className="flex items-center gap-3">
           <span className="text-zinc-500 uppercase tracking-wider text-[11px]">GRAFIKON TÍPUS:</span>
-          <div className="flex items-center gap-1">
+          <div className="flex items-center gap-1.5">
             <button
               onClick={() => setChartType('EQUITY')}
-              className={`px-2.5 py-0.5 text-xs ${
-                chartType === 'EQUITY'
-                  ? 'bg-zinc-800 text-zinc-100 font-bold border border-zinc-700'
-                  : 'text-zinc-400 hover:text-zinc-200 border border-transparent'
-              }`}
+              className={`tui-bracket-btn btn-sm ${chartType === 'EQUITY' ? 'is-selected' : ''}`}
             >
-              [EQUITY GÖRBE]
+              EQUITY GÖRBE
             </button>
             <button
               onClick={() => setChartType('DISTRIBUTION')}
-              className={`px-2.5 py-0.5 text-xs ${
-                chartType === 'DISTRIBUTION'
-                  ? 'bg-zinc-800 text-zinc-100 font-bold border border-zinc-700'
-                  : 'text-zinc-400 hover:text-zinc-200 border border-transparent'
-              }`}
+              className={`tui-bracket-btn btn-sm ${chartType === 'DISTRIBUTION' ? 'is-selected' : ''}`}
             >
-              [ELOSZLÁS / HISTOGRAM]
+              ELOSZLÁS / HISTOGRAM
             </button>
             <button
               onClick={() => setChartType('SCATTER')}
-              className={`px-2.5 py-0.5 text-xs ${
-                chartType === 'SCATTER'
-                  ? 'bg-zinc-800 text-zinc-100 font-bold border border-zinc-700'
-                  : 'text-zinc-400 hover:text-zinc-200 border border-transparent'
-              }`}
+              className={`tui-bracket-btn btn-sm ${chartType === 'SCATTER' ? 'is-selected' : ''}`}
             >
-              [SZÓRÁSDIAGRAM (SCATTER)]
+              SZÓRÁSDIAGRAM (SCATTER)
             </button>
           </div>
         </div>
 
         {/* Split Screen Switcher */}
-        <div className="flex items-center gap-2">
-          <span className="text-zinc-500 uppercase tracking-wider text-[11px]">MEGJELENÍTÉS:</span>
+        <div className="flex items-center gap-1.5">
+          <span className="text-zinc-500 uppercase tracking-wider text-[11px] mr-1">MEGJELENÍTÉS:</span>
           <button
             onClick={() => setIsSplitScreen(false)}
-            className={`px-2.5 py-0.5 text-xs ${
-              !isSplitScreen
-                ? 'bg-zinc-800 text-zinc-100 font-bold border border-zinc-700'
-                : 'text-zinc-400 hover:text-zinc-200 border border-transparent'
-            }`}
+            className={`tui-bracket-btn btn-sm ${!isSplitScreen ? 'is-selected' : ''}`}
           >
-            [EGYETLEN GRAFIKON]
+            EGYETLEN GRAFIKON
           </button>
           <button
             onClick={() => setIsSplitScreen(true)}
-            className={`px-2.5 py-0.5 text-xs ${
-              isSplitScreen
-                ? 'bg-zinc-800 text-zinc-100 font-bold border border-zinc-700'
-                : 'text-zinc-400 hover:text-zinc-200 border border-transparent'
-            }`}
+            className={`tui-bracket-btn btn-sm ${isSplitScreen ? 'is-selected' : ''}`}
           >
-            [OSZTOTT KÉPERNYŐ (SPLIT)]
+            OSZTOTT KÉPERNYŐ (SPLIT)
           </button>
         </div>
       </div>
@@ -246,7 +226,9 @@ export const AnalyticsView: React.FC<AnalyticsViewProps> = ({ committedTrades, s
                 </div>
                 <div>
                   <span className="text-zinc-500 block text-[10px]">EXPECTANCY (R):</span>
-                  <span className="font-bold text-zinc-100">+{activeSeriesMetrics.expectancyR.toFixed(2)}R</span>
+                  <span className="font-bold text-zinc-100">
+                    {activeSeriesMetrics.expectancyR >= 0 ? '+' : ''}{activeSeriesMetrics.expectancyR.toFixed(2)}R
+                  </span>
                 </div>
                 <div>
                   <span className="text-zinc-500 block text-[10px]">NETTO PNL:</span>
@@ -301,9 +283,9 @@ export const AnalyticsView: React.FC<AnalyticsViewProps> = ({ committedTrades, s
             <span>ADATSOROK (STACKING)</span>
             <button
               onClick={handleAddSeries}
-              className="px-2 py-0.5 border border-zinc-700 bg-zinc-800 hover:bg-zinc-700 text-zinc-200 text-[10px]"
+              className="tui-bracket-btn btn-xs"
             >
-              [+ ÚJ ADATSOR]
+              + ÚJ ADATSOR
             </button>
           </div>
 
@@ -345,9 +327,9 @@ export const AnalyticsView: React.FC<AnalyticsViewProps> = ({ committedTrades, s
                         e.stopPropagation();
                         handleToggleSeriesVisible(s.id);
                       }}
-                      className="px-1.5 py-0.2 border border-zinc-700 bg-zinc-800 text-[9px] text-zinc-300"
+                      className={`tui-bracket-btn btn-xs ${s.visible ? 'is-selected' : ''}`}
                     >
-                      {s.visible ? '[LÁTHATÓ]' : '[REJTETT]'}
+                      {s.visible ? 'LÁTHATÓ' : 'REJTETT'}
                     </button>
                     {seriesList.length > 1 && (
                       <button
@@ -355,9 +337,9 @@ export const AnalyticsView: React.FC<AnalyticsViewProps> = ({ committedTrades, s
                           e.stopPropagation();
                           handleDeleteSeries(s.id);
                         }}
-                        className="px-1.5 py-0.2 border border-zinc-700 bg-zinc-800 hover:bg-rose-900 text-[9px] text-zinc-400 hover:text-rose-200"
+                        className="tui-bracket-btn btn-xs btn-danger"
                       >
-                        [X]
+                        X
                       </button>
                     )}
                   </div>
@@ -372,9 +354,9 @@ export const AnalyticsView: React.FC<AnalyticsViewProps> = ({ committedTrades, s
               <span>EXTRÉM SZŰRŐMOTOR (KORLÁTLAN)</span>
               <button
                 onClick={handleAddRule}
-                className="px-2 py-0.5 border border-zinc-700 bg-zinc-800 hover:bg-zinc-700 text-zinc-200 text-[10px]"
+                className="tui-bracket-btn btn-xs"
               >
-                [+ ÚJ SZABÁLY]
+                + ÚJ SZABÁLY
               </button>
             </div>
 
@@ -385,9 +367,9 @@ export const AnalyticsView: React.FC<AnalyticsViewProps> = ({ committedTrades, s
                   <div className="mt-2">
                     <button
                       onClick={handleAddRule}
-                      className="px-3 py-1 border border-zinc-700 bg-zinc-800 hover:bg-zinc-700 text-zinc-200 text-xs"
+                      className="tui-bracket-btn btn-sm"
                     >
-                      [ELSŐ SZABÁLY HOZZÁADÁSA]
+                      ELSŐ SZABÁLY HOZZÁADÁSA
                     </button>
                   </div>
                 </div>
@@ -402,13 +384,9 @@ export const AnalyticsView: React.FC<AnalyticsViewProps> = ({ committedTrades, s
                             <button
                               key={op}
                               onClick={() => handleUpdateRule(rule.id, { logic: op })}
-                              className={`px-1.5 py-0.2 text-[9px] border ${
-                                rule.logic === op
-                                  ? 'bg-zinc-700 text-zinc-100 border-zinc-500 font-bold'
-                                  : 'bg-zinc-900 text-zinc-500 border-zinc-800 hover:text-zinc-300'
-                              }`}
+                              className={`tui-bracket-btn btn-xs ${rule.logic === op ? 'is-selected' : ''}`}
                             >
-                              [{op}]
+                              {op}
                             </button>
                           ))}
                         </div>
@@ -418,9 +396,9 @@ export const AnalyticsView: React.FC<AnalyticsViewProps> = ({ committedTrades, s
 
                       <button
                         onClick={() => handleDeleteRule(rule.id)}
-                        className="px-1.5 py-0.2 border border-zinc-700 bg-zinc-800 text-[9px] text-zinc-400 hover:text-rose-400"
+                        className="tui-bracket-btn btn-xs btn-danger"
                       >
-                        [TÖRLÉS]
+                        TÖRLÉS
                       </button>
                     </div>
 

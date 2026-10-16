@@ -135,33 +135,33 @@ export const TerminalChart: React.FC<TerminalChartProps> = ({
             <span className="text-zinc-500 text-[10px] mr-1">TENGELY SKÁLA:</span>
             <button
               onClick={() => handleZoomX(0.25)}
-              className="px-2 py-0.5 border border-zinc-700 bg-zinc-800 hover:bg-zinc-700 text-zinc-200 text-[10px]"
+              className="tui-bracket-btn btn-xs"
             >
-              [X +]
+              X +
             </button>
             <button
               onClick={() => handleZoomX(-0.25)}
-              className="px-2 py-0.5 border border-zinc-700 bg-zinc-800 hover:bg-zinc-700 text-zinc-200 text-[10px]"
+              className="tui-bracket-btn btn-xs"
             >
-              [X -]
+              X -
             </button>
             <button
               onClick={() => handleZoomY(0.25)}
-              className="px-2 py-0.5 border border-zinc-700 bg-zinc-800 hover:bg-zinc-700 text-zinc-200 text-[10px]"
+              className="tui-bracket-btn btn-xs"
             >
-              [Y +]
+              Y +
             </button>
             <button
               onClick={() => handleZoomY(-0.25)}
-              className="px-2 py-0.5 border border-zinc-700 bg-zinc-800 hover:bg-zinc-700 text-zinc-200 text-[10px]"
+              className="tui-bracket-btn btn-xs"
             >
-              [Y -]
+              Y -
             </button>
             <button
               onClick={handleResetZoom}
-              className="px-2 py-0.5 border border-zinc-700 bg-zinc-800 hover:bg-zinc-700 text-zinc-300 text-[10px]"
+              className="tui-bracket-btn btn-xs"
             >
-              [1:1 ALAP]
+              1:1 ALAP
             </button>
           </div>
         </div>

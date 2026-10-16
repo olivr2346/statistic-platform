@@ -60,7 +60,12 @@ export function parseCsvToTrades(csvText: string): Trade[] {
   
   const findIndex = (names: string[]) => {
     for (const name of names) {
-      const idx = headers.findIndex(h => h.includes(name));
+      const idx = headers.findIndex(h => {
+        if (name === 'r') {
+          return h === 'r' || h === '(r)' || h === 'r multiple' || h === 'r-multiple';
+        }
+        return h === name || h.includes(name);
+      });
       if (idx !== -1) return idx;
     }
     return -1;
@@ -73,8 +78,8 @@ export function parseCsvToTrades(csvText: string): Trade[] {
   const sizeIdx = findIndex(['size', 'volume', 'lots', 'contracts', 'qty']);
   const openPriceIdx = findIndex(['open price', 'openprice', 'entry price', 'entry_price']);
   const closePriceIdx = findIndex(['close price', 'closeprice', 'exit price', 'exit_price']);
-  const pnlIdx = findIndex(['pnl', 'profit', 'net profit', 'gain']);
-  const pnlRIdx = findIndex(['r-multiple', 'pnl r', 'pnlr', 'r', 'multiple']);
+  const pnlIdx = findIndex(['pnl ($)', 'net profit', 'gross profit', 'pnl', 'profit', 'gain']);
+  const pnlRIdx = findIndex(['pnl (r)', 'pnl r', 'pnlr', 'r-multiple', 'r multiple', 'multiple', 'r']);
 
   const trades: Trade[] = [];
 
@@ -114,8 +119,8 @@ export function parseCsvToTrades(csvText: string): Trade[] {
 
     let pnlR = pnlRIdx !== -1 ? parseFloat(cols[pnlRIdx]) : NaN;
     if (isNaN(pnlR)) {
-      // Estimate 1R as approximately $150 or percentage
-      pnlR = pnl >= 0 ? pnl / 150 : pnl / 150;
+      // Estimate 1R as approximately $150 or proportional value
+      pnlR = pnl / 150;
     }
 
     trades.push({

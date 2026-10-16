@@ -24,14 +24,32 @@ export function evaluateSingleRule(trade: Trade, rule: FilterRule): boolean {
         const boolRuleVal = ruleVal === true || ruleVal === 'true' || ruleVal === 1 || ruleVal === '1';
         return targetValue === boolRuleVal;
       }
-      return String(targetValue).trim().toLowerCase() === String(ruleVal).trim().toLowerCase();
+      const strTarget = String(targetValue).trim();
+      const strRule = String(ruleVal).trim();
+      if (strTarget !== '' && strRule !== '') {
+        const numTarget = Number(strTarget);
+        const numRule = Number(strRule);
+        if (!isNaN(numTarget) && !isNaN(numRule)) {
+          return numTarget === numRule;
+        }
+      }
+      return strTarget.toLowerCase() === strRule.toLowerCase();
     }
     case 'NOT_EQUALS': {
       if (typeof targetValue === 'boolean') {
         const boolRuleVal = ruleVal === true || ruleVal === 'true' || ruleVal === 1 || ruleVal === '1';
         return targetValue !== boolRuleVal;
       }
-      return String(targetValue).trim().toLowerCase() !== String(ruleVal).trim().toLowerCase();
+      const strTarget = String(targetValue).trim();
+      const strRule = String(ruleVal).trim();
+      if (strTarget !== '' && strRule !== '') {
+        const numTarget = Number(strTarget);
+        const numRule = Number(strRule);
+        if (!isNaN(numTarget) && !isNaN(numRule)) {
+          return numTarget !== numRule;
+        }
+      }
+      return strTarget.toLowerCase() !== strRule.toLowerCase();
     }
     case 'GREATER': {
       const numTarget = parseFloat(targetValue);

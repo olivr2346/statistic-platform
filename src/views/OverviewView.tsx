@@ -48,56 +48,36 @@ export const OverviewView: React.FC<OverviewViewProps> = ({ committedTrades }) =
       <div className="flex items-center justify-between border border-zinc-800 bg-zinc-900/40 px-3 py-1.5 shrink-0">
         <div className="flex items-center gap-2">
           <span className="text-zinc-500 text-xs uppercase tracking-wider">IDŐTÁV SZŰRŐ:</span>
-          <div className="flex items-center gap-1">
+          <div className="flex items-center gap-1.5">
             <button
               onClick={() => setTimeframe('ALL')}
-              className={`px-2.5 py-0.5 text-xs transition-colors ${
-                timeframe === 'ALL'
-                  ? 'bg-zinc-800 text-zinc-100 font-bold border border-zinc-700'
-                  : 'text-zinc-400 hover:text-zinc-200 border border-transparent'
-              }`}
+              className={`tui-bracket-btn btn-sm ${timeframe === 'ALL' ? 'is-selected' : ''}`}
             >
-              [Összes]
+              Összes
             </button>
             <button
               onClick={() => setTimeframe('LAST_100')}
-              className={`px-2.5 py-0.5 text-xs transition-colors ${
-                timeframe === 'LAST_100'
-                  ? 'bg-zinc-800 text-zinc-100 font-bold border border-zinc-700'
-                  : 'text-zinc-400 hover:text-zinc-200 border border-transparent'
-              }`}
+              className={`tui-bracket-btn btn-sm ${timeframe === 'LAST_100' ? 'is-selected' : ''}`}
             >
-              [Utolsó 100]
+              Utolsó 100
             </button>
             <button
               onClick={() => setTimeframe('LAST_50')}
-              className={`px-2.5 py-0.5 text-xs transition-colors ${
-                timeframe === 'LAST_50'
-                  ? 'bg-zinc-800 text-zinc-100 font-bold border border-zinc-700'
-                  : 'text-zinc-400 hover:text-zinc-200 border border-transparent'
-              }`}
+              className={`tui-bracket-btn btn-sm ${timeframe === 'LAST_50' ? 'is-selected' : ''}`}
             >
-              [Utolsó 50]
+              Utolsó 50
             </button>
             <button
               onClick={() => setTimeframe('30D')}
-              className={`px-2.5 py-0.5 text-xs transition-colors ${
-                timeframe === '30D'
-                  ? 'bg-zinc-800 text-zinc-100 font-bold border border-zinc-700'
-                  : 'text-zinc-400 hover:text-zinc-200 border border-transparent'
-              }`}
+              className={`tui-bracket-btn btn-sm ${timeframe === '30D' ? 'is-selected' : ''}`}
             >
-              [30 nap]
+              30 nap
             </button>
             <button
               onClick={() => setTimeframe('7D')}
-              className={`px-2.5 py-0.5 text-xs transition-colors ${
-                timeframe === '7D'
-                  ? 'bg-zinc-800 text-zinc-100 font-bold border border-zinc-700'
-                  : 'text-zinc-400 hover:text-zinc-200 border border-transparent'
-              }`}
+              className={`tui-bracket-btn btn-sm ${timeframe === '7D' ? 'is-selected' : ''}`}
             >
-              [7 nap]
+              7 nap
             </button>
           </div>
         </div>

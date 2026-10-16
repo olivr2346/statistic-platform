@@ -71,6 +71,7 @@ export const TableView: React.FC<TableViewProps> = ({ committedTrades, schemaTre
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
+    URL.revokeObjectURL(url);
   };
 
   const handleExportJson = () => {
@@ -83,6 +84,7 @@ export const TableView: React.FC<TableViewProps> = ({ committedTrades, schemaTre
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
+    URL.revokeObjectURL(url);
   };
 
   const selectedTrade = useMemo(() => {
@@ -106,56 +108,44 @@ export const TableView: React.FC<TableViewProps> = ({ committedTrades, schemaTre
           <div className="h-4 w-px bg-zinc-800" />
 
           <span className="text-zinc-500 uppercase tracking-wider text-[11px]">IRÁNY:</span>
-          <div className="flex items-center gap-1">
+          <div className="flex items-center gap-1.5">
             <button
               onClick={() => setDirectionFilter('ALL')}
-              className={`px-2 py-0.5 text-xs ${
-                directionFilter === 'ALL'
-                  ? 'bg-zinc-800 text-zinc-100 font-bold border border-zinc-700'
-                  : 'text-zinc-400 hover:text-zinc-200 border border-transparent'
-              }`}
+              className={`tui-bracket-btn btn-sm ${directionFilter === 'ALL' ? 'is-selected' : ''}`}
             >
-              [MIND]
+              MIND
             </button>
             <button
               onClick={() => setDirectionFilter('LONG')}
-              className={`px-2 py-0.5 text-xs ${
-                directionFilter === 'LONG'
-                  ? 'bg-zinc-800 text-zinc-100 font-bold border border-zinc-700'
-                  : 'text-zinc-400 hover:text-zinc-200 border border-transparent'
-              }`}
+              className={`tui-bracket-btn btn-sm ${directionFilter === 'LONG' ? 'is-selected' : ''}`}
             >
-              [LONG]
+              LONG
             </button>
             <button
               onClick={() => setDirectionFilter('SHORT')}
-              className={`px-2 py-0.5 text-xs ${
-                directionFilter === 'SHORT'
-                  ? 'bg-zinc-800 text-zinc-100 font-bold border border-zinc-700'
-                  : 'text-zinc-400 hover:text-zinc-200 border border-transparent'
-              }`}
+              className={`tui-bracket-btn btn-sm ${directionFilter === 'SHORT' ? 'is-selected' : ''}`}
             >
-              [SHORT]
+              SHORT
             </button>
           </div>
         </div>
 
-        {/* Export Buttons - Pure text buttons */}
+        {/* Export Buttons - Kinetikus Bracket Gombok */}
         <div className="flex items-center gap-2">
-          <span className="text-zinc-400 text-[11px]">
+          <span className="text-zinc-400 text-[11px] mr-1">
             TALÁLATOK: <span className="text-zinc-200 font-bold">{sorted.length}</span> / {committedTrades.length}
           </span>
           <button
             onClick={handleExportCsv}
-            className="px-2.5 py-0.5 border border-zinc-700 bg-zinc-800 hover:bg-zinc-700 text-zinc-200 text-xs tracking-wider"
+            className="tui-bracket-btn btn-sm"
           >
-            [CSV EXPORTÁLÁS]
+            CSV EXPORTÁLÁS
           </button>
           <button
             onClick={handleExportJson}
-            className="px-2.5 py-0.5 border border-zinc-700 bg-zinc-800 hover:bg-zinc-700 text-zinc-200 text-xs tracking-wider"
+            className="tui-bracket-btn btn-sm"
           >
-            [JSON EXPORTÁLÁS]
+            JSON EXPORTÁLÁS
           </button>
         </div>
       </div>

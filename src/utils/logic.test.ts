@@ -15,6 +15,7 @@ import {
   validateTradeCustomAttributes,
 } from './staging.ts';
 import { evaluateFilterRules } from './filterEngine.ts';
+import { parseCsvToTrades, exportTradesToCsv } from './csv.ts';
 
 const mockTrades: Trade[] = [
   {
@@ -241,4 +242,32 @@ test('evaluateFilterRules evaluates complex AND / OR / NOT chains', () => {
   assert.equal(evaluateFilterRules(mockTrades[0], rules), true); // NQ_F & 2.5 > 2.0
   assert.equal(evaluateFilterRules(mockTrades[1], rules), false); // NQ_F & -1.0 is not > 2.0
   assert.equal(evaluateFilterRules(mockTrades[2], rules), false); // ES_F != NQ_F
+});
+
+test('parseCsvToTrades accurately extracts PnL (R) without matching Trade ID or Direction columns', () => {
+  const csv = [
+    'Trade ID,Ticket ID,Symbol,Direction,Open Time,Close Time,Size,Open Price,Close Price,PnL ($),PnL (R),Status',
+    '"TRD_999","TK_123","NQ_F","LONG","2026-10-14T10:00:00Z","2026-10-14T10:30:00Z",2,20000,20050,1000,3.5,"COMMITTED"',
+  ].join('\n');
+
+  const parsed = parseCsvToTrades(csv);
+  assert.equal(parsed.length, 1);
+  assert.equal(parsed[0].symbol, 'NQ_F');
+  assert.equal(parsed[0].direction, 'LONG');
+  assert.equal(parsed[0].pnl, 1000);
+  assert.equal(parsed[0].pnlR, 3.5); // Must be 3.5, NOT overwritten by 1000/150 = 6.67!
+});
+
+test('evaluateFilterRules evaluates numeric equality across string and number formats', () => {
+  const rule: FilterRule = {
+    id: 'r_num',
+    field: 'retracement',
+    isCustomAttr: true,
+    operator: 'EQUALS',
+    value: '50.0', // String formatted float
+    logic: 'AND',
+  };
+
+  // mockTrades[0].customAttributes.retracement is numeric 50
+  assert.equal(evaluateFilterRules(mockTrades[0], [rule]), true);
 });

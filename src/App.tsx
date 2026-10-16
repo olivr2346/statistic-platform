@@ -48,7 +48,6 @@ export default function App() {
         currentTab={currentTab}
         onSelectTab={setCurrentTab}
         pendingCount={pendingTrades.length}
-        totalCommittedCount={committedTrades.length}
       />
 
       {/* Main View Router - Each view is a dedicated 100vh full-page view without pop-ups */}

@@ -134,12 +134,32 @@ export const SchemaBuilderView: React.FC<SchemaBuilderViewProps> = ({
     setNodeRequired(node.isRequired);
   };
 
+  const getSubtreeIds = (nodes: SchemaNode[], targetId: string): string[] => {
+    const findAndCollect = (list: SchemaNode[]): string[] | null => {
+      for (const node of list) {
+        if (node.id === targetId) {
+          const collect = (n: SchemaNode): string[] => [n.id, ...(n.children ? n.children.flatMap(collect) : [])];
+          return collect(node);
+        }
+        if (node.children && node.children.length > 0) {
+          const res = findAndCollect(node.children);
+          if (res) return res;
+        }
+      }
+      return null;
+    };
+    return findAndCollect(nodes) || [targetId];
+  };
+
   const handleDeleteNode = (id: string) => {
+    const idsToRemove = new Set(getSubtreeIds(schemaTree, id));
     const updated = deleteNodeRecursive(schemaTree, id);
     onUpdateSchemaTree(updated);
-    // Also remove any constraints referring to this node
-    onUpdateConstraints(constraintRules.filter(r => r.sourceNodeId !== id && r.targetNodeId !== id));
-    if (editingNodeId === id) {
+    // Also remove any constraints referring to this node or any of its descendant children
+    onUpdateConstraints(
+      constraintRules.filter(r => !idsToRemove.has(r.sourceNodeId) && !idsToRemove.has(r.targetNodeId))
+    );
+    if (editingNodeId && idsToRemove.has(editingNodeId)) {
       setEditingNodeId(null);
       setNodeName('');
     }
@@ -189,7 +209,7 @@ export const SchemaBuilderView: React.FC<SchemaBuilderViewProps> = ({
             )}
           </div>
 
-          {/* Action buttons (Text only) */}
+          {/* Action buttons (Kinetikus Bracket Gombok) */}
           <div className="flex items-center gap-1.5">
             <button
               onClick={() => {
@@ -199,21 +219,21 @@ export const SchemaBuilderView: React.FC<SchemaBuilderViewProps> = ({
                 setNodeType('BOOLEAN');
                 setNodeRequired(false);
               }}
-              className="px-2 py-0.5 border border-zinc-700 bg-zinc-800 hover:bg-zinc-700 text-[10px] text-zinc-200"
+              className="tui-bracket-btn btn-xs"
             >
-              [+ ALKATEGÓRIA]
+              + ALKATEGÓRIA
             </button>
             <button
               onClick={() => startEditNode(node)}
-              className="px-2 py-0.5 border border-zinc-700 bg-zinc-800 hover:bg-zinc-700 text-[10px] text-zinc-300"
+              className="tui-bracket-btn btn-xs"
             >
-              [SZERKESZTÉS]
+              SZERKESZTÉS
             </button>
             <button
               onClick={() => handleDeleteNode(node.id)}
-              className="px-2 py-0.5 border border-zinc-700 bg-zinc-800 hover:bg-rose-900 text-[10px] text-zinc-400 hover:text-rose-200"
+              className="tui-bracket-btn btn-xs btn-danger"
             >
-              [TÖRLÉS]
+              TÖRLÉS
             </button>
           </div>
         </div>
@@ -228,27 +248,19 @@ export const SchemaBuilderView: React.FC<SchemaBuilderViewProps> = ({
     <div className="h-[calc(100vh-42px)] flex flex-col p-2.5 gap-2 bg-zinc-950 font-mono select-none overflow-hidden">
       {/* Top Switcher */}
       <div className="flex items-center justify-between border border-zinc-800 bg-zinc-900/50 px-3 py-1.5 shrink-0 text-xs">
-        <div className="flex items-center gap-1">
+        <div className="flex items-center gap-1.5">
           <span className="text-zinc-500 uppercase tracking-wider text-[11px] mr-2">STRUKTÚRA ÉPÍTŐ:</span>
           <button
             onClick={() => setActiveTab('TREE')}
-            className={`px-3 py-0.5 text-xs ${
-              activeTab === 'TREE'
-                ? 'bg-zinc-800 text-zinc-100 font-bold border border-zinc-700'
-                : 'text-zinc-400 hover:text-zinc-200 border border-transparent'
-            }`}
+            className={`tui-bracket-btn btn-sm ${activeTab === 'TREE' ? 'is-selected' : ''}`}
           >
-            [VÉGTELEN KATEGÓRIAFA ({flatNodes.length} ELEM)]
+            VÉGTELEN KATEGÓRIAFA ({flatNodes.length} ELEM)
           </button>
           <button
             onClick={() => setActiveTab('CONSTRAINTS')}
-            className={`px-3 py-0.5 text-xs ${
-              activeTab === 'CONSTRAINTS'
-                ? 'bg-zinc-800 text-zinc-100 font-bold border border-zinc-700'
-                : 'text-zinc-400 hover:text-zinc-200 border border-transparent'
-            }`}
+            className={`tui-bracket-btn btn-sm ${activeTab === 'CONSTRAINTS' ? 'is-selected' : ''}`}
           >
-            [ÖSSZEFÉRHETETLENSÉGI MÁTRIX ({constraintRules.length} SZABÁLY)]
+            ÖSSZEFÉRHETETLENSÉGI MÁTRIX ({constraintRules.length} SZABÁLY)
           </button>
         </div>
 
@@ -272,9 +284,9 @@ export const SchemaBuilderView: React.FC<SchemaBuilderViewProps> = ({
                   setNodeType('TEXT');
                   setNodeRequired(false);
                 }}
-                className="px-2 py-0.5 border border-zinc-700 bg-zinc-800 hover:bg-zinc-700 text-zinc-200 text-[10px]"
+                className="tui-bracket-btn btn-xs"
               >
-                [+ ÚJ FŐKATEGÓRIA]
+                + ÚJ FŐKATEGÓRIA
               </button>
             </div>
 
@@ -345,9 +357,9 @@ export const SchemaBuilderView: React.FC<SchemaBuilderViewProps> = ({
                 <button
                   onClick={handleSaveNode}
                   disabled={!nodeName.trim()}
-                  className="flex-1 py-2 bg-emerald-600 hover:bg-emerald-500 disabled:opacity-40 disabled:pointer-events-none text-zinc-950 font-bold text-xs tracking-wider border border-emerald-400"
+                  className="flex-1 tui-bracket-btn btn-accent is-selected"
                 >
-                  [CSOMÓPONT MENTÉSE]
+                  CSOMÓPONT MENTÉSE
                 </button>
                 {editingNodeId && (
                   <button
@@ -355,9 +367,9 @@ export const SchemaBuilderView: React.FC<SchemaBuilderViewProps> = ({
                       setEditingNodeId(null);
                       setNodeName('');
                     }}
-                    className="px-3 py-2 border border-zinc-700 bg-zinc-800 hover:bg-zinc-700 text-zinc-200 text-xs"
+                    className="tui-bracket-btn btn-sm"
                   >
-                    [MÉGSE]
+                    MÉGSE
                   </button>
                 )}
               </div>
@@ -410,9 +422,9 @@ export const SchemaBuilderView: React.FC<SchemaBuilderViewProps> = ({
                         <td className="py-2 px-2 text-right">
                           <button
                             onClick={() => handleDeleteConstraint(rule.id)}
-                            className="px-2 py-0.5 border border-zinc-700 bg-zinc-800 hover:bg-rose-900 text-[10px] text-zinc-400 hover:text-rose-200"
+                            className="tui-bracket-btn btn-xs btn-danger"
                           >
-                            [TÖRLÉS]
+                            TÖRLÉS
                           </button>
                         </td>
                       </tr>
@@ -482,9 +494,9 @@ export const SchemaBuilderView: React.FC<SchemaBuilderViewProps> = ({
                 <button
                   onClick={handleAddConstraint}
                   disabled={!sourceNodeId || !targetNodeId || sourceNodeId === targetNodeId}
-                  className="w-full py-2 bg-emerald-600 hover:bg-emerald-500 disabled:opacity-40 disabled:pointer-events-none text-zinc-950 font-bold text-xs tracking-wider border border-emerald-400"
+                  className="w-full tui-bracket-btn btn-accent is-selected"
                 >
-                  [SZABÁLY RÖGZÍTÉSE A MÁTRIXBAN]
+                  SZABÁLY RÖGZÍTÉSE A MÁTRIXBAN
                 </button>
               </div>
             </div>

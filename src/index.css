@@ -26,3 +26,176 @@
     background: #3f3f46;
   }
 }
+
+:root {
+  /* Színpaletta */
+  --bg-base: #060606;
+  --bg-surface: #111111;
+  --border-dim: #222222;
+  --border-control: #3D3D3D;
+  --border-hover: #666666;
+  
+  --txt-primary: #EDEDED;
+  --txt-secondary: #888888;
+  --txt-muted: #555555;
+
+  /* Kiemelt szín (Foszfor Zöld) */
+  --bracket-accent: #00E676;
+  --bracket-active-bg: rgba(0, 230, 118, 0.05);
+
+  /* Kinetikus dimenziók & időzítés */
+  --bracket-speed: 0.18s;     /* Mozgási sebesség */
+  --bracket-fade: 0.05s;      /* Finom színátmenet idő */
+  --bracket-ear-len: 8px;     /* Nyugalmi kapocshossz */
+  --bracket-hover-len: 12px;   /* Hover kapocshossz */
+  --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+}
+
+/* ==========================================================================
+   Kinetikus Bracket Gomb [ ] -> [==]
+   ========================================================================== */
+.tui-bracket-btn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: transparent;
+  border: none;
+  outline: none;
+  cursor: pointer;
+  user-select: none;
+  font-family: var(--font-mono, monospace);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--txt-secondary, #888888);
+  padding: 5px 14px;
+  border-radius: 0px !important;
+  box-shadow: none !important;
+  white-space: nowrap;
+  transition: color 0.05s ease, background-color 0.05s ease;
+}
+
+/* Bal oldali kapocs: [ */
+.tui-bracket-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: var(--bracket-ear-len, 8px);
+  border: 1px solid var(--border-control, #3D3D3D);
+  border-right: none;
+  box-sizing: border-box;
+  pointer-events: none;
+  transition: width var(--bracket-speed, 0.18s) cubic-bezier(0.2, 0, 0, 1),
+              border-color 0.05s ease 0s;
+}
+
+/* Jobb oldali kapocs: ] */
+.tui-bracket-btn::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  right: 0;
+  width: var(--bracket-ear-len, 8px);
+  border: 1px solid var(--border-control, #3D3D3D);
+  border-left: none;
+  box-sizing: border-box;
+  pointer-events: none;
+  transition: width var(--bracket-speed, 0.18s) cubic-bezier(0.2, 0, 0, 1),
+              border-color 0.05s ease 0s;
+}
+
+/* Egér fölé vitel (Hover) */
+.tui-bracket-btn:hover:not(.is-selected):not(:disabled) {
+  color: var(--txt-primary, #EDEDED);
+}
+.tui-bracket-btn:hover:not(.is-selected):not(:disabled)::before,
+.tui-bracket-btn:hover:not(.is-selected):not(:disabled)::after {
+  width: var(--bracket-hover-len, 12px);
+  border-color: var(--border-hover, #666666);
+}
+
+/* KIVÁLASZTOTT (ZÁRT) ÁLLAPOT */
+.tui-bracket-btn.is-selected {
+  color: var(--bracket-accent, #00E676);
+  background-color: var(--bracket-active-bg, rgba(0, 230, 118, 0.05));
+  transition: color 0.05s ease,
+              background-color 0.05s ease var(--bracket-speed, 0.18s);
+}
+
+.tui-bracket-btn.is-selected::before {
+  width: calc(50% + 1px);
+  border-color: var(--bracket-accent, #00E676);
+  transition: width var(--bracket-speed, 0.18s) cubic-bezier(0.2, 0, 0, 1),
+              border-color 0.05s ease var(--bracket-speed, 0.18s);
+}
+
+.tui-bracket-btn.is-selected::after {
+  width: 50%;
+  border-color: var(--bracket-accent, #00E676);
+  transition: width var(--bracket-speed, 0.18s) cubic-bezier(0.2, 0, 0, 1),
+              border-color 0.05s ease var(--bracket-speed, 0.18s);
+}
+
+/* Kattintás / Lenomás (Active) pillanat */
+.tui-bracket-btn:active:not(:disabled)::before {
+  width: calc(50% + 1px);
+  border-color: var(--bracket-accent, #00E676);
+}
+.tui-bracket-btn:active:not(:disabled)::after {
+  width: 50%;
+  border-color: var(--bracket-accent, #00E676);
+}
+.tui-bracket-btn:active:not(:disabled) {
+  color: var(--bracket-accent, #00E676);
+  background-color: var(--bracket-active-bg, rgba(0, 230, 118, 0.05));
+}
+
+/* Letiltott (Disabled) állapot */
+.tui-bracket-btn:disabled,
+.tui-bracket-btn[disabled] {
+  opacity: 0.35 !important;
+  cursor: not-allowed !important;
+  pointer-events: none !important;
+}
+
+/* Kompakt méret variációk */
+.tui-bracket-btn.btn-sm {
+  padding: 3px 10px;
+  font-size: 10px;
+}
+.tui-bracket-btn.btn-xs {
+  padding: 2px 7px;
+  font-size: 9px;
+  letter-spacing: 0.02em;
+}
+
+/* Kiemelt / Akció CTA variáns */
+.tui-bracket-btn.btn-accent {
+  color: var(--bracket-accent, #00E676);
+}
+.tui-bracket-btn.btn-accent::before,
+.tui-bracket-btn.btn-accent::after {
+  border-color: var(--bracket-accent, #00E676);
+}
+
+/* Veszély / Törlés variáns */
+.tui-bracket-btn.btn-danger:hover:not(.is-selected):not(:disabled) {
+  color: #ef4444;
+}
+.tui-bracket-btn.btn-danger:hover:not(.is-selected):not(:disabled)::before,
+.tui-bracket-btn.btn-danger:hover:not(.is-selected):not(:disabled)::after {
+  border-color: #ef4444;
+}
+.tui-bracket-btn.btn-danger:active:not(:disabled)::before,
+.tui-bracket-btn.btn-danger:active:not(:disabled)::after {
+  border-color: #ef4444;
+}
+.tui-bracket-btn.btn-danger:active:not(:disabled) {
+  color: #ef4444;
+}

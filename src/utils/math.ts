@@ -249,19 +249,8 @@ export function buildDistributionHistogram(
   }
 
   for (const v of values) {
-    let assigned = false;
-    for (let i = 0; i < binCount; i++) {
-      const isLast = i === binCount - 1;
-      if (v >= bins[i].min && (isLast ? v <= bins[i].max : v < bins[i].max)) {
-        bins[i].count++;
-        assigned = true;
-        break;
-      }
-    }
-    if (!assigned) {
-      if (v <= bins[0].min) bins[0].count++;
-      else bins[binCount - 1].count++;
-    }
+    const binIdx = Math.min(binCount - 1, Math.max(0, Math.floor((v - min) / binWidth)));
+    bins[binIdx].count++;
   }
 
   for (const b of bins) {

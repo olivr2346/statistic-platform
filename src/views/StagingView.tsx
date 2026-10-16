@@ -229,18 +229,27 @@ NQ_F,LONG,2026-09-18T13:30:00Z,2026-09-18T14:15:00Z,2,20120.50,20195.00,1490.00,
   };
 
   const handleCommitBatchScreenshots = () => {
+    // Group all matched screenshots by tradeId to avoid overwriting in state updates
+    const screenshotsByTrade = new Map<string, string[]>();
+
     batchFileList.forEach(item => {
       if (item.matchedTradeId && batchDataUrls[item.name]) {
-        const trd = pendingTrades.find(t => t.id === item.matchedTradeId);
-        if (trd) {
-          const updatedScreenshots = [...trd.screenshots, batchDataUrls[item.name]];
-          onUpdatePendingTrade({
-            ...trd,
-            screenshots: updatedScreenshots,
-          });
-        }
+        const list = screenshotsByTrade.get(item.matchedTradeId) || [];
+        list.push(batchDataUrls[item.name]);
+        screenshotsByTrade.set(item.matchedTradeId, list);
       }
     });
+
+    screenshotsByTrade.forEach((urls, tradeId) => {
+      const trd = pendingTrades.find(t => t.id === tradeId);
+      if (trd) {
+        onUpdatePendingTrade({
+          ...trd,
+          screenshots: [...trd.screenshots, ...urls],
+        });
+      }
+    });
+
     setBatchFileList([]);
     setBatchDataUrls({});
     setSubView('WORKSTATION');
@@ -250,37 +259,25 @@ NQ_F,LONG,2026-09-18T13:30:00Z,2026-09-18T14:15:00Z,2,20120.50,20195.00,1490.00,
     <div className="h-[calc(100vh-42px)] flex flex-col p-2.5 gap-2 bg-zinc-950 font-mono select-none overflow-hidden">
       {/* Subview Selector Bar */}
       <div className="flex items-center justify-between border border-zinc-800 bg-zinc-900/50 px-3 py-1.5 shrink-0 text-xs">
-        <div className="flex items-center gap-1">
+        <div className="flex items-center gap-1.5">
           <span className="text-zinc-500 uppercase tracking-wider text-[11px] mr-2">FELDOLGOZÓ ÜZEMMÓD:</span>
           <button
             onClick={() => setSubView('WORKSTATION')}
-            className={`px-3 py-0.5 text-xs transition-colors ${
-              subView === 'WORKSTATION'
-                ? 'bg-zinc-800 text-zinc-100 font-bold border border-zinc-700'
-                : 'text-zinc-400 hover:text-zinc-200 border border-transparent'
-            }`}
+            className={`tui-bracket-btn btn-sm ${subView === 'WORKSTATION' ? 'is-selected' : ''}`}
           >
-            [MUNKAÁLLOMÁS ({pendingTrades.length})]
+            MUNKAÁLLOMÁS ({pendingTrades.length})
           </button>
           <button
             onClick={() => setSubView('CSV_IMPORT')}
-            className={`px-3 py-0.5 text-xs transition-colors ${
-              subView === 'CSV_IMPORT'
-                ? 'bg-zinc-800 text-zinc-100 font-bold border border-zinc-700'
-                : 'text-zinc-400 hover:text-zinc-200 border border-transparent'
-            }`}
+            className={`tui-bracket-btn btn-sm ${subView === 'CSV_IMPORT' ? 'is-selected' : ''}`}
           >
-            [CSV IMPORT & DEDUPLIKÁCIÓ]
+            CSV IMPORT & DEDUPLIKÁCIÓ
           </button>
           <button
             onClick={() => setSubView('SCREENSHOT_DROP')}
-            className={`px-3 py-0.5 text-xs transition-colors ${
-              subView === 'SCREENSHOT_DROP'
-                ? 'bg-zinc-800 text-zinc-100 font-bold border border-zinc-700'
-                : 'text-zinc-400 hover:text-zinc-200 border border-transparent'
-            }`}
+            className={`tui-bracket-btn btn-sm ${subView === 'SCREENSHOT_DROP' ? 'is-selected' : ''}`}
           >
-            [BATCH KÉP PÁROSÍTÓ]
+            BATCH KÉP PÁROSÍTÓ
           </button>
         </div>
 
@@ -303,15 +300,15 @@ NQ_F,LONG,2026-09-18T13:30:00Z,2026-09-18T14:15:00Z,2,20120.50,20195.00,1490.00,
               <div className="flex items-center gap-3 mt-2">
                 <button
                   onClick={onNavigateToTable}
-                  className="px-4 py-1.5 border border-zinc-700 bg-zinc-800 hover:bg-zinc-700 text-zinc-100 text-xs"
+                  className="tui-bracket-btn btn-sm"
                 >
-                  [TÁBLÁZAT MEGTEKINTÉSE]
+                  TÁBLÁZAT MEGTEKINTÉSE
                 </button>
                 <button
                   onClick={() => setSubView('CSV_IMPORT')}
-                  className="px-4 py-1.5 border border-zinc-700 bg-zinc-800 hover:bg-zinc-700 text-zinc-100 text-xs"
+                  className="tui-bracket-btn btn-sm"
                 >
-                  [ÚJ CSV IMPORTÁLÁSA]
+                  ÚJ CSV IMPORTÁLÁSA
                 </button>
               </div>
             </div>
@@ -320,14 +317,14 @@ NQ_F,LONG,2026-09-18T13:30:00Z,2026-09-18T14:15:00Z,2,20120.50,20195.00,1490.00,
               <>
                 {/* Stepper & Raw Data Summary Header */}
                 <div className="border border-zinc-800 bg-zinc-900/40 px-3 py-1.5 flex items-center justify-between shrink-0 text-xs">
-                  {/* Stepper Buttons (Text Only) */}
+                  {/* Stepper Buttons (Kinetikus Bracket Gombok) */}
                   <div className="flex items-center gap-2">
                     <button
                       onClick={handlePrevTrade}
                       disabled={currentIndex === 0}
-                      className="px-2 py-0.5 border border-zinc-700 bg-zinc-800 hover:bg-zinc-700 disabled:opacity-30 disabled:pointer-events-none text-zinc-200"
+                      className="tui-bracket-btn btn-xs"
                     >
-                      [ &lt; ELŐZŐ ]
+                      &lt; ELŐZŐ
                     </button>
                     <span className="font-bold text-zinc-100 px-1">
                       KÖTÉS {currentIndex + 1} / {pendingTrades.length}
@@ -335,9 +332,9 @@ NQ_F,LONG,2026-09-18T13:30:00Z,2026-09-18T14:15:00Z,2,20120.50,20195.00,1490.00,
                     <button
                       onClick={handleNextTrade}
                       disabled={currentIndex === pendingTrades.length - 1}
-                      className="px-2 py-0.5 border border-zinc-700 bg-zinc-800 hover:bg-zinc-700 disabled:opacity-30 disabled:pointer-events-none text-zinc-200"
+                      className="tui-bracket-btn btn-xs"
                     >
-                      [ KÖVETKEZŐ &gt; ]
+                      KÖVETKEZŐ &gt;
                     </button>
                   </div>
 
@@ -388,21 +385,21 @@ NQ_F,LONG,2026-09-18T13:30:00Z,2026-09-18T14:15:00Z,2,20120.50,20195.00,1490.00,
                       <div className="flex items-center gap-1">
                         <button
                           onClick={() => setZoomLevel(prev => Math.min(4, prev + 0.25))}
-                          className="px-1.5 py-0.5 border border-zinc-700 bg-zinc-800 hover:bg-zinc-700 text-zinc-200 text-[10px]"
+                          className="tui-bracket-btn btn-xs"
                         >
-                          [+]
+                          +
                         </button>
                         <button
                           onClick={() => setZoomLevel(prev => Math.max(0.4, prev - 0.25))}
-                          className="px-1.5 py-0.5 border border-zinc-700 bg-zinc-800 hover:bg-zinc-700 text-zinc-200 text-[10px]"
+                          className="tui-bracket-btn btn-xs"
                         >
-                          [-]
+                          -
                         </button>
                         <button
                           onClick={resetZoomPan}
-                          className="px-1.5 py-0.5 border border-zinc-700 bg-zinc-800 hover:bg-zinc-700 text-zinc-300 text-[10px]"
+                          className="tui-bracket-btn btn-xs"
                         >
-                          [1:1 ALAP]
+                          1:1 ALAP
                         </button>
                       </div>
                     </div>
@@ -445,9 +442,9 @@ NQ_F,LONG,2026-09-18T13:30:00Z,2026-09-18T14:15:00Z,2,20120.50,20195.00,1490.00,
                                 screenshots: [dummyUrl],
                               });
                             }}
-                            className="mt-3 px-3 py-1 border border-zinc-700 bg-zinc-800 hover:bg-zinc-700 text-zinc-200 text-xs"
+                            className="mt-3 tui-bracket-btn btn-sm btn-accent"
                           >
-                            [SZIMULÁLT KÉP CSATOLÁSA]
+                            SZIMULÁLT KÉP CSATOLÁSA
                           </button>
                         </div>
                       )}
@@ -468,13 +465,9 @@ NQ_F,LONG,2026-09-18T13:30:00Z,2026-09-18T14:15:00Z,2,20120.50,20195.00,1490.00,
                               setCurrentImageIndex(idx);
                               resetZoomPan();
                             }}
-                            className={`px-2 py-0.5 text-[10px] border ${
-                              currentImageIndex === idx
-                                ? 'bg-zinc-700 text-zinc-100 border-zinc-500 font-bold'
-                                : 'bg-zinc-800 text-zinc-400 border-zinc-700 hover:text-zinc-200'
-                            }`}
+                            className={`tui-bracket-btn btn-xs ${currentImageIndex === idx ? 'is-selected' : ''}`}
                           >
-                            [KÉP {idx + 1}]
+                            KÉP {idx + 1}
                           </button>
                         ))}
                       </div>
@@ -536,7 +529,8 @@ NQ_F,LONG,2026-09-18T13:30:00Z,2026-09-18T14:15:00Z,2,20120.50,20195.00,1490.00,
                                   return false;
                                 });
 
-                                const isDisabled = Boolean(conflictRule);
+                                const isCurrentlyChecked = Boolean(currentValue);
+                                const isDisabled = Boolean(conflictRule) && !isCurrentlyChecked;
 
                                 return (
                                   <div key={child.id} className="text-xs">
@@ -627,13 +621,11 @@ NQ_F,LONG,2026-09-18T13:30:00Z,2026-09-18T14:15:00Z,2,20120.50,20195.00,1490.00,
                       <button
                         onClick={handleCommit}
                         disabled={!validation.isValid}
-                        className={`w-full py-2 text-xs font-bold tracking-wider transition-colors border ${
-                          validation.isValid
-                            ? 'bg-emerald-600 hover:bg-emerald-500 text-zinc-950 border-emerald-400 cursor-pointer'
-                            : 'bg-zinc-800/60 text-zinc-500 border-zinc-800 cursor-not-allowed opacity-60'
+                        className={`w-full tui-bracket-btn py-2 text-xs font-bold tracking-wider ${
+                          validation.isValid ? 'is-selected btn-accent' : ''
                         }`}
                       >
-                        [TÁBLÁZATBA VÉGLEGESÍT]
+                        TÁBLÁZATBA VÉGLEGESÍT
                       </button>
                     </div>
                   </div>
@@ -642,26 +634,18 @@ NQ_F,LONG,2026-09-18T13:30:00Z,2026-09-18T14:15:00Z,2,20120.50,20195.00,1490.00,
                   <div className="col-span-3 border border-zinc-800 bg-zinc-950 flex flex-col overflow-hidden">
                     <div className="flex items-center justify-between px-3 py-1.5 border-b border-zinc-800 bg-zinc-900/60 text-xs">
                       <span className="text-zinc-300 font-bold text-[11px]">KERESKEDÉSI JEGYZET</span>
-                      <div className="flex items-center gap-1">
+                      <div className="flex items-center gap-1.5">
                         <button
                           onClick={() => setMarkdownMode('EDIT')}
-                          className={`px-2 py-0.5 text-[10px] border ${
-                            markdownMode === 'EDIT'
-                              ? 'bg-zinc-700 text-zinc-100 border-zinc-500 font-bold'
-                              : 'bg-zinc-800 text-zinc-400 border-zinc-700 hover:text-zinc-200'
-                          }`}
+                          className={`tui-bracket-btn btn-xs ${markdownMode === 'EDIT' ? 'is-selected' : ''}`}
                         >
-                          [SZERKESZTŐ]
+                          SZERKESZTŐ
                         </button>
                         <button
                           onClick={() => setMarkdownMode('PREVIEW')}
-                          className={`px-2 py-0.5 text-[10px] border ${
-                            markdownMode === 'PREVIEW'
-                              ? 'bg-zinc-700 text-zinc-100 border-zinc-500 font-bold'
-                              : 'bg-zinc-800 text-zinc-400 border-zinc-700 hover:text-zinc-200'
-                          }`}
+                          className={`tui-bracket-btn btn-xs ${markdownMode === 'PREVIEW' ? 'is-selected' : ''}`}
                         >
-                          [ELŐNÉZET]
+                          ELŐNÉZET
                         </button>
                       </div>
                     </div>
@@ -708,9 +692,9 @@ NQ_F,LONG,2026-09-18T13:30:00Z,2026-09-18T14:15:00Z,2,20120.50,20195.00,1490.00,
             <div className="flex items-center gap-2">
               <button
                 onClick={handleLoadSampleCsv}
-                className="px-3 py-1 border border-zinc-700 bg-zinc-800 hover:bg-zinc-700 text-zinc-200 text-xs"
+                className="tui-bracket-btn btn-sm"
               >
-                [MINTA CSV BEILLESZTÉSE]
+                MINTA CSV BEILLESZTÉSE
               </button>
             </div>
           </div>
@@ -728,9 +712,9 @@ NQ_F,LONG,2026-09-18T13:30:00Z,2026-09-18T14:15:00Z,2,20120.50,20195.00,1490.00,
           <div className="flex items-center gap-3">
             <button
               onClick={handleProcessCsv}
-              className="px-4 py-1.5 border border-zinc-700 bg-zinc-800 hover:bg-zinc-700 text-zinc-100 text-xs font-bold"
+              className="tui-bracket-btn btn-sm btn-accent"
             >
-              [CSV ELEMZÉSE ÉS IMPORTÁLÁSA]
+              CSV ELEMZÉSE ÉS IMPORTÁLÁSA
             </button>
           </div>
 
@@ -757,9 +741,9 @@ NQ_F,LONG,2026-09-18T13:30:00Z,2026-09-18T14:15:00Z,2,20120.50,20195.00,1490.00,
                 <div className="pt-2 flex justify-end">
                   <button
                     onClick={handleAcceptImportedTrades}
-                    className="px-4 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-zinc-950 text-xs font-bold border border-emerald-400"
+                    className="tui-bracket-btn btn-sm is-selected"
                   >
-                    [+ {stagedImportTrades.length} KÖTÉS HOZZÁADÁSA A STAGINGHEZ]
+                    + {stagedImportTrades.length} KÖTÉS HOZZÁADÁSA A STAGINGHEZ
                   </button>
                 </div>
               )}
@@ -782,9 +766,9 @@ NQ_F,LONG,2026-09-18T13:30:00Z,2026-09-18T14:15:00Z,2,20120.50,20195.00,1490.00,
             </div>
             <button
               onClick={handleSimulateSampleScreenshots}
-              className="px-3 py-1 border border-zinc-700 bg-zinc-800 hover:bg-zinc-700 text-zinc-200 text-xs"
+              className="tui-bracket-btn btn-sm"
             >
-              [MINTA KÉPEK SZIMULÁLÁSA]
+              MINTA KÉPEK SZIMULÁLÁSA
             </button>
           </div>
 
@@ -807,9 +791,9 @@ NQ_F,LONG,2026-09-18T13:30:00Z,2026-09-18T14:15:00Z,2,20120.50,20195.00,1490.00,
                 <span className="font-bold text-zinc-200">AUTOMATIKUS PÁROSÍTÁSI EREDMÉNYEK ({batchFileList.length} FÁJL)</span>
                 <button
                   onClick={handleCommitBatchScreenshots}
-                  className="px-3 py-1 bg-emerald-600 hover:bg-emerald-500 text-zinc-950 font-bold text-xs border border-emerald-400"
+                  className="tui-bracket-btn btn-sm is-selected"
                 >
-                  [PÁROSÍTÁSOK MENTÉSE ÉS CSATOLÁSA]
+                  PÁROSÍTÁSOK MENTÉSE ÉS CSATOLÁSA
                 </button>
               </div>
 
